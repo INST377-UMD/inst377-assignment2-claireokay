@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="dogs.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-slider/1.0.0/simpleslider.min.js"></script>
+    <script src="dogs.js" defer></script>
+</head>
+<body>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="dogs.html">Dog</a>
+        <a href="stocks.html">Stocks</a> 
+    </nav>
+    <h1>Dogs</h1>
+    <div id="myslider" style="width:300px; height: 300px"></div>
+    <div id="breeds"></div>
+    <div id="dogInfo"></div>
+    <div id="audioinstruct">
+        <h2>Navigate with Audio Instructions</h2>
+        <p> 
+            To use navigation, please use the following prompts:
+        </p>
+            <dl>
+                <dt>Hello</dt>
+                <dd>-  Alerts with Hello World</dd>
+                <dt>Change the color to &lt;color&gt;</dt>
+                <dd>- Changes the background color of the page to &lt;color&gt; </dd>
+                <dt>Navigate to &lt;page&gt; </dt>
+                <dd>- Navigate to said page</dd>
+                <dt>Load Dog Breed </dt>
+                <dd>- Display container about the breed</dd>
+            </dl> 
+        <button id="on" onclick="getlistening()">Turn on Listening</button>
+        <button id="off" onclick="turnOffListening()">Turn off Listening</button>
+    </div>
+</body>
+<script>
+    function getlistening(){
+    annyang.start({ autoRestart: false });
+};
+
+function turnOffListening(){
+    annyang.abort();
+};
+if (annyang) {
+    const helloFunction = function() {
+        alert("Hello")
+    };
+
+    const colorChange = function(color) {
+        document.body.style.backgroundColor = color;
+    };
+
+    const navigate = function(page) {
+        const routes = {
+        dogs: 'inst377-assignment2-claireokay/dogs.html',
+        stocks: 'inst377-assignment2-claireokay/stocks.html',
+        home: 'inst377-assignment2-claireokay/home.html'
+        };
+
+        const path = routes[page.toLowerCase()];
+        if (path) {
+        window.location.href = path;
+    }
+    };
+    const getBreed = async function(dog) {
+            const targetName = dog.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            let pageNumber = 1;
+            let keepSearching = true;
+
+            while (keepSearching) {
+                const apiUrl = `https://dogapi.dog/api/v2/breeds?page[number]=${pageNumber}`;
+                console.log(`Searching page ${pageNumber}: ${apiUrl}`); 
+                
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    console.error(`API Error: ${response.status} - ${response.statusText} for page ${pageNumber}`);
+                    keepSearching = false;
+                    break;
+                }
+
+                const pageData = await response.json();
+
+                if (pageData && pageData.data && pageData.data.length > 0) {
+                    for (const breedItem of pageData.data) {
+                        if (breedItem.attributes.name.toLowerCase() === targetName.toLowerCase()) {
+                            console.log(`Match found for "${targetName}"!`);
+
+                            const infoContainer = document.getElementById("dogInfo");
+                            infoContainer.innerHTML = "";
+
+                            const info = breedItem.attributes;
+                            const div = document.createElement('div');
+
+                            const name = info.name;
+                            const description = info.description;
+                            const minLife= info.life.min;
+                            const maxLife = info.life.max;
+                            div.innerHTML = `
+                                <h3>${name}</h3>
+                                <p><strong>Description:</strong> ${description}</p>
+                                <p><strong>Min Life:</strong> ${minLife}</p>
+                                <p><strong>Max Life:</strong> ${maxLife}</p>
+                            `;
+
+                            infoContainer.appendChild(div);
+                            return;
+                        }
+                    }
+
+                    if (!pageData.links || !pageData.links.next) {
+                        console.log(`Reached last page (${pageNumber}) without finding "${targetName}".`);
+                        keepSearching = false; 
+                    } else {
+                        pageNumber++;
+                    }
+                } else {
+                    console.log(`Page ${pageNumber} contained no data. Stopping search.`); 
+                    keepSearching = false;
+                }
+            }
+            const infoContainer = document.getElementById("dogInfo");
+            infoContainer.innerHTML = "<p>No information about this breed.</p>";
+        };
+
+    const commands = {'hello': helloFunction, 
+        'change the color to *color': colorChange,
+        'navigate to *page': navigate,
+        'Load Dog Breed *dog': getBreed};
+        
+    annyang.addCommands(commands);
+}
+
+
+annyang.addCallback('resultMatch', function(helloFunction, colorChange, navigate) {
+  console.log(helloFunction); 
+  console.log(colorChange); 
+  console.log(navigate); 
+});
+
+simpleslider.getSlider();
+</script>
+</html>
