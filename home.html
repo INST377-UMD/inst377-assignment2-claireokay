@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="home.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <script src="home.js" defer></script>
+</head>
+<body>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="dogs.html">Dog</a>
+        <a href="stocks.html">Stocks</a> 
+    </nav>
+    <h1>Homepage</h1>
+    <div class="buttons">
+        <a href="dogs.html">
+            <button class="button-51" role="button" >Dogs</button>
+        </a>
+        <a href="stocks.html">
+            <button class="button-51" role="button">Stocks</button>
+        </a>
+    </div>
+    <br>
+    <div class="quotearea">
+        <h1>Quote of the Page Load</h1>
+        <h2 id="quote"></h2>
+    </div>
+    <div id="audioinstruct">
+        <h2>Navigate with Audio Instructions</h2>
+        <p> 
+            To use navigation, please use the following prompts:
+        </p>
+            <dl>
+                <dt>Hello</dt>
+                <dd>-  Alerts with Hello World</dd>
+                <dt>Change the color to &lt;color&gt;</dt>
+                <dd>- Changes the background color of the page to &lt;color&gt; </dd>
+                <dt>Navigate to &lt;page&gt; </dt>
+                <dd>- Navigate to said page</dd>
+            </dl> 
+        <button id="on" onclick="getlistening()">Turn on Listening</button>
+        <button id="off" onclick="turnOffListening()">Turn off Listening</button>
+    </div>
+</body>
+<script>
+    function getlistening(){
+    annyang.start({ autoRestart: false });
+};
+
+function turnOffListening(){
+    annyang.abort();
+};
+if (annyang) {
+    const helloFunction = function() {
+        alert("Hello")
+    };
+
+    const colorChange = function(color) {
+        document.body.style.backgroundColor = color;
+    };
+
+    const navigate = function(page) {
+        const routes = {
+        dogs: 'inst377-assignment2-claireokay/dogs.html',
+        stocks: 'inst377-assignment2-claireokay/stocks.html',
+        home: 'inst377-assignment2-claireokay/home.html'
+        };
+
+        const path = routes[page.toLowerCase()];
+        if (path) {
+        window.location.href = path;
+    }
+    };
+    const commands = {'hello': helloFunction, 
+        'change the color to *color': colorChange,
+        'navigate to *page': navigate};
+
+    annyang.addCommands(commands);
+}
+</script>
+</html>
+

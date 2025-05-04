@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="stocks.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <script src="stocks.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="dogs.html">Dog</a>
+        <a href="stocks.html">Stocks</a> 
+    </nav>
+    <h1>Stocks - Let's Chart</h1>
+    <canvas id="stockChart" width="800" height="400"></canvas>
+    <input id="stockname">
+    <br>
+    <select id="time">
+        <option value="30">30 Days</option>
+        <option value="60">60 Days</option>
+        <option value="90">90 Days</option>
+    </select>
+    <br>
+    <br>
+    <button class="button-26" role="button" onclick="searchStock()">Look up!</button>
+    <table id="topstocks">
+        <tr>
+            <th>Ticker</th>
+            <th>Comment Count</th>
+            <th>Sentiment</th>
+        </tr>
+    </table>
+    <div id="audioinstruct">
+        <h2>Navigate with Audio Instructions</h2>
+        <p> 
+            To use navigation, please use the following prompts:
+        </p>
+            <dl>
+                <dt>Hello</dt>
+                <dd>-  Alerts with Hello World</dd>
+                <dt>Change the color to &lt;color&gt;</dt>
+                <dd>- Changes the background color of the page to &lt;color&gt; </dd>
+                <dt>Navigate to &lt;page&gt; </dt>
+                <dd>- Navigate to said page</dd>
+                <dt>Lookup Stock </dt>
+                <dd>- Looks up said stock and graphs it over 30 days</dd>
+            </dl> 
+        <button id="on" onclick="getlistening()">Turn on Listening</button>
+        <button id="off" onclick="turnOffListening()">Turn off Listening</button>
+    </div>
+</body>
+<script>
+    function getlistening(){
+    annyang.start({ autoRestart: false });
+};
+
+function turnOffListening(){
+    annyang.abort();
+};
+if (annyang) {
+    const helloFunction = function() {
+        alert("Hello")
+    };
+
+    const colorChange = function(color) {
+        document.body.style.backgroundColor = color;
+    };
+
+    const navigate = function(page) {
+        const routes = {
+        dogs: 'inst377-assignment2-claireokay/dogs.html',
+        stocks: 'inst377-assignment2-claireokay/stocks.html',
+        home: 'inst377-assignment2-claireokay/home.html'
+        };
+
+        const path = routes[page.toLowerCase()];
+        if (path) {
+        window.location.href = path;
+    }
+    };
+
+    const lookupStock = async function(stock) {
+        const API_KEY = 'SmOL9DSaTi5reXnaIlm_uaqdLGu81zV9';
+        let chart;
+
+    const name = stock.trim().toUpperCase();
+    const searchUrl = `https://api.polygon.io/v3/reference/tickers?search=${name}&active=true&apiKey=${API_KEY}`;
+    const searchRes = await fetch(searchUrl);
+    const searchData = await searchRes.json();
+
+    let ticker = '';
+    if (searchData && searchData.results && searchData.results.length > 0) {
+        ticker = searchData.results[0].ticker;
+    } else {
+        alert("Stock not found.");
+        return;
+    }
+
+    const end = new Date().toISOString().split("T")[0];
+    const start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; // ✅ Corrected variable name from 'length' to 'start'
+
+    const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${start}/${end}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    let labels = [];
+    let prices = [];
+
+    if (data.results) {
+        labels = data.results.map(r => new Date(r.t).toLocaleDateString());
+        prices = data.results.map(r => r.c);
+    } else {
+        alert("No chart data found.");
+        return;
+    }
+
+    if (chart) chart.destroy();
+
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `${ticker} - Last 30 Days`,
+                data: prices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: { display: true, text: 'Date' }
+                },
+                y: {
+                    display: true,
+                    title: { display: true, text: 'Price (USD)' }
+                }
+            }
+        }
+    });
+     };
+    const commands = {'hello': helloFunction, 
+        'change the color to *color': colorChange,
+        'navigate to *page': navigate,
+       'lookup *stock': lookupStock};
+        
+    annyang.addCommands(commands);
+}
+
+
+annyang.addCallback('resultMatch', function(helloFunction, colorChange, navigate, lookupStock) {
+  console.log(helloFunction); 
+  console.log(colorChange); 
+  console.log(navigate); 
+  console.log(lookupStock);
+});
+</script>
+</html>

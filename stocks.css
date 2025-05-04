@@ -1,0 +1,111 @@
+nav {
+    background-color: #6DCFF6;
+    color: #00132C;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 20px;
+    padding: 10px 23px;
+    border: 1px solid #266DB6;
+}
+nav a { 
+    padding: 
+    10px 23px;
+}
+nav a:hover{ 
+    background-color: #00132C;
+    color:#D5EDF6;
+}
+
+#audioinstruct {
+    border: 1px solid #266DB6;
+    border-width: 10px;
+    padding: 10px ;
+    width: 400px;
+    height: relative;
+    position: relative;
+    margin: auto;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+#audioinstruct h2 {
+    text-align: center;
+}
+#audioinstruct dt {
+    color:#266DB6;
+    text-align: left;
+}
+
+#audioinstruct button {
+    align-items: center;
+    margin: auto;
+}
+
+#topstocks {
+    border: 1px solid #266DB6;
+    border-width: 10px;
+    padding: 10px ;
+    width: 400px;
+    height: relative;
+    position: relative;
+    margin: auto;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+#topstocks th, td{
+    border: .25px solid #266DB6;
+    border-width: 1px;
+    padding: 10px ;
+    width: 400px;
+    height: relative;
+    position: relative;
+    margin: auto;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.button-26 {
+    appearance: button;
+    background-color: #1652F0;
+    border: 1px solid #1652F0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Graphik,-apple-system,system-ui,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+    font-size: 14px;
+    line-height: 1.15;
+    overflow: visible;
+    padding: 12px 16px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transition: all 80ms ease-in-out;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+  }
+  
+  .button-26:disabled {
+    opacity: .5;
+  }
+  
+  .button-26:focus {
+    outline: 0;
+  }
+  
+  .button-26:hover {
+    background-color: #0A46E4;
+    border-color: #0A46E4;
+  }
+  
+  .button-26:active {
+    background-color: #0039D7;
+    border-color: #0039D7;
+  }
+
+canvas {
+    display: none;
+}
